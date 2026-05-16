@@ -50,6 +50,7 @@ DEFAULT_ENTRY_COMMAND_TEMPLATE = "python {entry_file}"
 DEFAULT_HF_LANGUAGES = ("python", "js", "cpp", "rust", "java")
 DEFAULT_HF_PATH = "data/{language}/test.parquet"
 DEFAULT_HF_CARD_PATH = "README.md"
+DEFAULT_ANON_REPO_URL = "https://anonymous.4open.science/r/ascb-CA26/"
 DEFAULT_ANON_REPO_REF = "main"
 LEGACY_HF_PARQUET_PATHS = ("data/test.parquet", "data/c++/test.parquet")
 
@@ -224,15 +225,15 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help=(
             "Anonymize problem identifiers and generated test runners for "
-            "submission. Requires --anon-repo-url."
+            "submission."
         ),
     )
     parser.add_argument(
         "--anon-repo-url",
-        default=None,
+        default=DEFAULT_ANON_REPO_URL,
         help=(
             "Anonymized problems git repository URL embedded in generated "
-            "test runners. Required with --anonymize."
+            f"test runners (default with --anonymize: {DEFAULT_ANON_REPO_URL})."
         ),
     )
     parser.add_argument(
@@ -251,9 +252,9 @@ def parse_args() -> argparse.Namespace:
         parser.error("--private requires --create-hf-repo")
     if args.hf_token and not args.upload_to_hf:
         parser.error("--hf-token requires --upload-to-hf")
-    if args.anonymize and not args.anon_repo_url:
-        parser.error("--anonymize requires --anon-repo-url")
-    if not args.anonymize and (args.anon_repo_url or args.anon_repo_ref):
+    if not args.anonymize and (
+        args.anon_repo_url != DEFAULT_ANON_REPO_URL or args.anon_repo_ref
+    ):
         parser.error("--anon-repo-url/--anon-repo-ref require --anonymize")
     return args
 
@@ -652,6 +653,15 @@ def make_test_runner_script(
 
         if [[ -n "{repo_env_empty_expr}" ]]; then
           REPO_DIR="{repo_env_value}"
+        elif [[ "$REPO_URL" == *"anonymous.4open.science"* ]]; then
+          REPO_DIR="$WORKDIR/{clone_dir_name}"
+          ANON_NAME="$(printf '%s' "$REPO_URL" | sed -E 's#.*/r/([^/]+)/?.*#\\1#')"
+          ZIP_URL="https://anonymous.4open.science/api/repo/$ANON_NAME/zip"
+          TMP_ZIP="$WORKDIR/anon-repo.zip"
+          curl -fsSL "$ZIP_URL" -o "$TMP_ZIP"
+          mkdir -p "$REPO_DIR"
+          unzip -q "$TMP_ZIP" -d "$REPO_DIR"
+          rm -f "$TMP_ZIP"
         else
           REPO_DIR="$WORKDIR/{clone_dir_name}"
           git clone --filter=blob:none "$REPO_URL" "$REPO_DIR"
@@ -824,7 +834,7 @@ def build_rows(
             if anonymize
             else source_problem_name
         )
-        problem_path = problem_name if anonymize else problem_dir.name
+        problem_path = problem_dir.name
         runner_label = "Benchmark" if anonymize else "SCBench"
         env_prefix = "BENCH" if anonymize else "SCB"
         clone_dir_name = "benchmark-problems" if anonymize else "scb-problems"

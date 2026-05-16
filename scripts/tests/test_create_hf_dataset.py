@@ -170,6 +170,38 @@ def test_dataset_card_autopopulates_hf_metadata_and_explains_tests(
     assert "SCB_KEEP_WORKDIR=1 bash test.sh /path/to/submission" in card
 
 
+def test_anonymize_defaults_test_runner_to_anonymous_repo(
+    tmp_path: Path,
+    monkeypatch: Any,
+) -> None:
+    _write_problem(tmp_path)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "create_hf_dataset.py",
+            "--repo-root",
+            str(tmp_path),
+            "--anonymize",
+        ],
+    )
+
+    args = create_hf_dataset.parse_args()
+    rows = create_hf_dataset.build_rows(
+        repo_root=tmp_path,
+        language=args.language,
+        repo_url=args.anon_repo_url,
+        repo_ref=args.anon_repo_ref or create_hf_dataset.DEFAULT_ANON_REPO_REF,
+        entry_file_template=args.entry_file_template,
+        entry_command_template=args.entry_command_template,
+        strip_canary=not args.keep_canary,
+        anonymize=args.anonymize,
+    )
+
+    assert args.anon_repo_url == "https://anonymous.4open.science/r/ascb-CA26/"
+    assert "https://anonymous.4open.science/r/ascb-CA26/" in rows[0]["tests"]
+
+
 def test_anonymized_dataset_card_omits_source_identifiers(
     tmp_path: Path,
 ) -> None:
