@@ -153,8 +153,10 @@ All template expressions in conditions, response bodies, and response headers re
   - `http_path`
   - `http_method`
   - `http_host`
-  - `http_req`
-  - `http_res`
+  - `http_req`: the raw request body decoded as UTF-8 with invalid bytes
+    replaced; use `""` when the request body is empty
+  - `http_res`: the final rendered response body decoded as UTF-8 with invalid
+    bytes replaced; use `""` when the response body is empty
 
 # Duplicate Keys
 

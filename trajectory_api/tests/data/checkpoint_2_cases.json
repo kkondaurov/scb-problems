@@ -2769,7 +2769,7 @@
         },
         "id": "finalize_metrics_exactly_50_entries",
         "method": "POST",
-        "path": "/trajectories/{{store.hidden_create_for_rev_tracking}}/finalize"
+        "path": "/trajectories/{{store.finalize_accepts_valid_base}}/finalize"
       },
       "expected": {
         "output": {
@@ -3036,27 +3036,27 @@
         },
         "headers": {
           "content-type": "application/json; charset=utf-8",
-          "if-match": "W/\"2\""
+          "if-match": "W/\"1\""
         },
         "id": "finalize_response_has_finalized_at",
         "method": "POST",
-        "path": "/trajectories/{{store.hidden_create_for_response_validation}}/finalize"
+        "path": "/trajectories/{{store.finalize_accepts_valid_base}}/finalize"
       },
       "expected": {
         "output": {
           "properties": {
             "final_cost": {
-              "const": 0.005
+              "const": 0.001
             },
             "final_output_tokens": {
-              "const": 50
+              "const": 10
             },
             "finalized_at": {
               "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
               "type": "string"
             },
             "id": {
-              "const": "{{store.hidden_create_for_response_validation}}"
+              "const": "{{store.finalize_accepts_valid_base}}"
             },
             "metrics": {
               "properties": {
@@ -3074,13 +3074,13 @@
               "type": "object"
             },
             "rev": {
-              "const": 3
+              "const": 2
             },
             "status": {
               "const": "finalized"
             },
             "steps": {
-              "const": 4
+              "const": 3
             }
           },
           "required": [
@@ -3201,6 +3201,13 @@
               "input_tokens": 5,
               "output_tokens": 15,
               "role": "assistant"
+            },
+            {
+              "content": "Trajectory finalized.",
+              "cost": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "role": "environment"
             }
           ]
         },
@@ -3225,7 +3232,7 @@
               "const": "finalized"
             },
             "steps": {
-              "const": 2
+              "const": 3
             }
           },
           "required": [
@@ -3729,7 +3736,7 @@
         "body": {},
         "headers": {
           "content-type": "application/json; charset=utf-8",
-          "if-match": "W/\"4\""
+          "if-match": "W/\"5\""
         },
         "id": "rev_tracking_finalize",
         "method": "POST",
@@ -3746,7 +3753,7 @@
               "const": "{{store.hidden_create_for_rev_sequence}}"
             },
             "rev": {
-              "const": 5
+              "const": 6
             },
             "status": {
               "const": "finalized"
@@ -3827,7 +3834,7 @@
               "const": "{{store.hidden_create_for_rev_sequence}}"
             },
             "rev": {
-              "const": 4
+              "const": 5
             },
             "status": {
               "const": "in_progress"
@@ -3923,6 +3930,54 @@
             },
             "rev": {
               "const": 4
+            },
+            "status": {
+              "const": "in_progress"
+            }
+          },
+          "required": [
+            "id",
+            "status",
+            "rev",
+            "appended"
+          ],
+          "type": "object"
+        },
+        "status_code": 200
+      }
+    },
+    "rev_tracking_fourth_append": {
+      "case": {
+        "body": {
+          "steps": [
+            {
+              "content": "Ready to finalize.",
+              "cost": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "role": "environment"
+            }
+          ]
+        },
+        "headers": {
+          "content-type": "application/json; charset=utf-8",
+          "if-match": "W/\"4\""
+        },
+        "id": "rev_tracking_fourth_append",
+        "method": "POST",
+        "path": "/trajectories/{{store.hidden_create_for_rev_sequence}}/steps"
+      },
+      "expected": {
+        "output": {
+          "properties": {
+            "appended": {
+              "const": 1
+            },
+            "id": {
+              "const": "{{store.hidden_create_for_rev_sequence}}"
+            },
+            "rev": {
+              "const": 5
             },
             "status": {
               "const": "in_progress"
@@ -4605,6 +4660,13 @@
               "input_tokens": 5,
               "output_tokens": 10,
               "role": "assistant"
+            },
+            {
+              "content": "Trajectory finalized.",
+              "cost": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "role": "environment"
             }
           ]
         },
@@ -4635,7 +4697,7 @@
               "const": "finalized"
             },
             "steps": {
-              "const": 2
+              "const": 3
             }
           },
           "required": [
@@ -4962,7 +5024,7 @@
                   "const": 10
                 },
                 "steps": {
-                  "const": 2
+                  "const": 3
                 }
               },
               "type": "object"

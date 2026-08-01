@@ -293,7 +293,7 @@ def test_result_alternate_invalid_then_valid_matches(
             "expected": {
                 "returncode": 0,
                 "stdout_exact": "Assignment Score: 3 / 3\n",
-                "stderr_contains": ["alternate"],
+                "stderr_contains_casefold": ["alternate"],
             },
         },
     )

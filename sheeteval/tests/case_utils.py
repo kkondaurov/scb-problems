@@ -156,6 +156,16 @@ def _assert_contains(haystack: str, needles: list[str], label: str) -> None:
         assert needle in haystack, f"Missing {label} fragment: {needle!r}"
 
 
+def _assert_casefold_contains(
+    haystack: str, needles: list[str], label: str
+) -> None:
+    folded_haystack = haystack.casefold()
+    for needle in needles:
+        assert str(needle).casefold() in folded_haystack, (
+            f"Missing {label} case-insensitive fragment: {needle!r}"
+        )
+
+
 def _assert_not_contains(
     haystack: str, needles: list[str], label: str
 ) -> None:
@@ -297,6 +307,16 @@ def run_case(
     stderr_contains = expected.get("stderr_contains") or []
     if stderr_contains:
         _assert_contains(result.stderr, list(stderr_contains), "stderr")
+
+    stderr_contains_casefold = (
+        expected.get("stderr_contains_casefold") or []
+    )
+    if stderr_contains_casefold:
+        _assert_casefold_contains(
+            result.stderr,
+            list(stderr_contains_casefold),
+            "stderr",
+        )
 
     stderr_not_contains = expected.get("stderr_not_contains") or []
     if stderr_not_contains:

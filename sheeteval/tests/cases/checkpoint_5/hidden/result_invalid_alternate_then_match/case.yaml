@@ -57,7 +57,9 @@
     "returncode": 0,
     "stdout_exact": "Assignment Score: 4 / 4\n",
     "stderr_contains": [
-      "Warning:",
+      "Warning:"
+    ],
+    "stderr_contains_casefold": [
       "alternate"
     ]
   }

@@ -61,7 +61,7 @@
   "expected": {
     "returncode": 0,
     "stdout_exact": "Assignment Score: 3 / 3\n",
-    "stderr_contains": [
+    "stderr_contains_casefold": [
       "unknown rule kind 'regex'"
     ]
   }

@@ -22,8 +22,10 @@ When disabled, every `/convert` request re-downloads/parses and replaces stored 
 
 ### Per-request bypass
 
-`force` is a presence flag. If present once, it forces re-ingestion and replaces the cached dataset.
-Any additional `force` value is `HTTP 400`.
+`force` is a presence flag. Exactly one bare (`?force`) or empty (`?force=`)
+occurrence forces re-ingestion and replaces the cached dataset. A non-empty
+value (for example `?force=true`) or a repeated `force` parameter in any
+combination is `HTTP 400`.
 
 If caching is disabled, `force` has no additional effect.
 

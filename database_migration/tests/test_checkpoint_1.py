@@ -5,11 +5,11 @@
 """Tests for checkpoint_1: Basic Schema Migrations."""
 
 import json
-import shutil
 import sqlite3
 import subprocess
 
 import pytest
+from conftest import copy_seed_database
 
 
 def run_command(entrypoint_argv, *args, timeout=60):
@@ -88,7 +88,7 @@ def test_add_column(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Add a column to an existing table."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "add_column.db", db_file)
+    copy_seed_database(seeds_dir / "add_column.db", db_file)
 
     migration = {
         "version": 2,
@@ -132,7 +132,7 @@ def test_multiple_operations(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Apply multiple operations in a single migration."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "multiple_operations.db", db_file)
+    copy_seed_database(seeds_dir / "multiple_operations.db", db_file)
 
     migration = {
         "version": 3,
@@ -199,7 +199,7 @@ def test_skip_already_applied(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Skip migrations that have already been applied."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "skip_already_applied.db", db_file)
+    copy_seed_database(seeds_dir / "skip_already_applied.db", db_file)
 
     migration = {
         "version": 1,
@@ -257,7 +257,7 @@ def test_drop_single_column(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Drop a single column from a table."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "drop_single_column.db", db_file)
+    copy_seed_database(seeds_dir / "drop_single_column.db", db_file)
 
     migration = {
         "version": 2,
@@ -292,7 +292,7 @@ def test_drop_column_preserve_data(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Drop column while preserving existing data."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "drop_column_preserve_data.db", db_file)
+    copy_seed_database(seeds_dir / "drop_column_preserve_data.db", db_file)
 
     migration = {
         "version": 2,
@@ -331,7 +331,7 @@ def test_multiple_drop_columns(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Drop multiple columns in a single migration."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "multiple_drop_columns.db", db_file)
+    copy_seed_database(seeds_dir / "multiple_drop_columns.db", db_file)
 
     migration = {
         "version": 2,
@@ -587,7 +587,7 @@ def test_default_values_various_types(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Create table with various default value types."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "default_values_various_types.db", db_file)
+    copy_seed_database(seeds_dir / "default_values_various_types.db", db_file)
 
     migration = {
         "version": 2,
@@ -642,7 +642,7 @@ def test_add_column_with_default_to_populated_table(
     """Functionality: Add columns with defaults to a populated table."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(
+    copy_seed_database(
         seeds_dir / "add_column_with_default_to_populated_table.db", db_file
     )
 
@@ -703,7 +703,7 @@ def test_complex_data_preservation(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Complex migration with add and drop operations preserving data."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "complex_data_preservation.db", db_file)
+    copy_seed_database(seeds_dir / "complex_data_preservation.db", db_file)
 
     migration = {
         "version": 2,
@@ -766,7 +766,7 @@ def test_add_not_null_with_default(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Add a NOT NULL column with a default value."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "add_not_null_with_default.db", db_file)
+    copy_seed_database(seeds_dir / "add_not_null_with_default.db", db_file)
 
     migration = {
         "version": 2,
@@ -945,7 +945,7 @@ def test_mixed_operations_all_types(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Mixed create_table, add_column, and drop_column operations."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "mixed_operations_all_types.db", db_file)
+    copy_seed_database(seeds_dir / "mixed_operations_all_types.db", db_file)
 
     migration = {
         "version": 2,
@@ -1035,7 +1035,7 @@ def test_non_sequential_versions(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Apply migration with non-sequential version number."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "non_sequential_versions.db", db_file)
+    copy_seed_database(seeds_dir / "non_sequential_versions.db", db_file)
 
     migration = {
         "version": 10,
@@ -1214,7 +1214,7 @@ def test_table_exists(entrypoint_argv, seeds_dir, tmp_path):
     """Error: Attempting to create a table that already exists should fail."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "table_exists.db", db_file)
+    copy_seed_database(seeds_dir / "table_exists.db", db_file)
 
     migration = {
         "version": 2,

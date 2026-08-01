@@ -12,11 +12,6 @@ import httpx
 import jsonschema
 import pytest
 
-_NO_ACTIVE_BOOTSTRAP_REASON = (
-    "Checkpoint 3/4 does not define a no-active base_version sentinel; "
-    "skipping first-proposal flows that require bootstrap semantics."
-)
-
 
 def _is_json_schema(payload: Any) -> bool:
     """Check if a payload looks like a JSON Schema definition."""
@@ -57,51 +52,24 @@ def _make_request(
 ) -> httpx.Response:
     """Make HTTP request to the server."""
     if method == "POST":
-        if (
-            path.endswith(":propose")
-            and body is not None
-            and body.get("base_version") == 0
-        ):
-            parts = path.strip("/").split("/")
-            if len(parts) >= 4 and parts[0] == "v1" and parts[1] == "configs":
-                config_name = parts[2]
-                scope = body.get("scope")
-                if isinstance(scope, dict):
-                    active_response = client.post(
-                        f"/v1/configs/{config_name}:active",
-                        json={"scope": scope},
-                    )
-                    if active_response.status_code != 200:
-                        pytest.skip(_NO_ACTIVE_BOOTSTRAP_REASON)
-                    active_payload = active_response.json()
-                    active_version = active_payload.get("version")
-                    if not isinstance(active_version, int):
-                        pytest.skip(_NO_ACTIVE_BOOTSTRAP_REASON)
-                    body = {**body, "base_version": active_version}
         return client.post(path, json=body)
     if method == "GET":
         return client.get(path)
     raise ValueError(f"Unsupported method: {method}")
 
 
-def _first_proposal_id_or_skip(
-    proposals: list[dict[str, Any]],
-    *,
-    reason: str = _NO_ACTIVE_BOOTSTRAP_REASON,
-) -> int:
-    if not proposals:
-        pytest.skip(reason)
+def _first_proposal_id(proposals: list[dict[str, Any]]) -> int:
+    assert proposals, "Expected at least one proposal."
     proposal_id = proposals[0].get("proposal_id")
-    if not isinstance(proposal_id, int):
-        pytest.skip(reason)
+    assert isinstance(proposal_id, int), (
+        f"Expected integer proposal_id, got {proposal_id!r}."
+    )
     return proposal_id
 
 
-def _proposal_id_for_draft_or_skip(
+def _proposal_id_for_draft(
     proposals: list[dict[str, Any]],
     draft_version: int,
-    *,
-    reason: str = _NO_ACTIVE_BOOTSTRAP_REASON,
 ) -> int:
     for proposal in proposals:
         proposal_id = proposal.get("proposal_id")
@@ -109,7 +77,76 @@ def _proposal_id_for_draft_or_skip(
             proposal_id, int
         ):
             return proposal_id
-    pytest.skip(reason)
+    raise AssertionError(
+        f"Expected proposal for draft version {draft_version}, got {proposals}."
+    )
+
+
+def _activate_initial_version(
+    client: httpx.Client,
+    *,
+    name: str,
+    scope: dict[str, str],
+) -> None:
+    """Create and merge v1 for an otherwise unused config identity."""
+    policy_response = _make_request(
+        client,
+        "POST",
+        f"/v1/configs/{name}:policy",
+        body={
+            "scope": scope,
+            "required_approvals": 1,
+            "allow_author_approval": True,
+        },
+    )
+    assert policy_response.status_code == 200, policy_response.text
+
+    create_response = _make_request(
+        client,
+        "POST",
+        f"/v1/configs/{name}",
+        body={"scope": scope, "config": {"value": 1}},
+    )
+    assert create_response.status_code == 201, create_response.text
+
+    active_response = _make_request(
+        client,
+        "POST",
+        f"/v1/configs/{name}:active",
+        body={"scope": scope},
+    )
+    _assert_error_code(active_response, 404, {"not_found"})
+
+    proposal_response = _make_request(
+        client,
+        "POST",
+        f"/v1/configs/{name}/1:propose",
+        body={"scope": scope, "author": "alice", "base_version": 0},
+    )
+    assert proposal_response.status_code == 201, proposal_response.text
+    proposal = proposal_response.json()
+    assert proposal.get("base_version") == 0, proposal
+    proposal_id = proposal.get("proposal_id")
+    assert isinstance(proposal_id, int), proposal
+
+    review_response = _make_request(
+        client,
+        "POST",
+        f"/v1/proposals/{proposal_id}:review",
+        body={"actor": "alice", "decision": "approve"},
+    )
+    assert review_response.status_code == 200, review_response.text
+
+    merge_response = _make_request(
+        client,
+        "POST",
+        f"/v1/proposals/{proposal_id}:merge",
+        body={},
+    )
+    assert merge_response.status_code == 200, merge_response.text
+    merge = merge_response.json()
+    assert merge.get("activated_version") == 1, merge
+    assert merge.get("previous_active") is None, merge
 
 
 def _assert_response(
@@ -630,6 +667,116 @@ class TestCore:
             200,
             {"ok": True},
         )
+
+
+# =============================================================================
+# Base-version semantics - each scenario owns its complete config lifecycle
+# =============================================================================
+
+
+class TestBaseVersionSemantics:
+    """Exercise inherited bootstrap and concurrency behavior independently."""
+
+    def test_initial_proposal_uses_zero_without_fake_active_version(
+        self, client: httpx.Client
+    ) -> None:
+        name = "base-semantics-initial"
+        scope = {"env": "base-semantics-initial"}
+        policy_response = _make_request(
+            client,
+            "POST",
+            f"/v1/configs/{name}:policy",
+            body={
+                "scope": scope,
+                "required_approvals": 1,
+                "allow_author_approval": True,
+            },
+        )
+        assert policy_response.status_code == 200, policy_response.text
+        create_response = _make_request(
+            client,
+            "POST",
+            f"/v1/configs/{name}",
+            body={"scope": scope, "config": {"value": 1}},
+        )
+        assert create_response.status_code == 201, create_response.text
+
+        active_response = _make_request(
+            client,
+            "POST",
+            f"/v1/configs/{name}:active",
+            body={"scope": scope},
+        )
+        _assert_error_code(active_response, 404, {"not_found"})
+
+        proposal_response = _make_request(
+            client,
+            "POST",
+            f"/v1/configs/{name}/1:propose",
+            body={"scope": scope, "author": "alice", "base_version": 0},
+        )
+        assert proposal_response.status_code == 201, proposal_response.text
+        proposal = proposal_response.json()
+        assert proposal.get("base_version") == 0, proposal
+        diffs = proposal.get("diffs", {})
+        initial_patch = [{"op": "add", "path": "/value", "value": 1}]
+        assert diffs.get("raw_json_patch") == initial_patch, diffs
+        assert diffs.get("resolved_json_patch") == initial_patch, diffs
+        assert diffs.get("includes_changes") == [], diffs
+
+    def test_proposal_accepts_exact_current_active_version(
+        self, client: httpx.Client
+    ) -> None:
+        name = "base-semantics-current"
+        scope = {"env": "base-semantics-current"}
+        _activate_initial_version(client, name=name, scope=scope)
+
+        active_response = _make_request(
+            client,
+            "POST",
+            f"/v1/configs/{name}:active",
+            body={"scope": scope},
+        )
+        assert active_response.status_code == 200, active_response.text
+        assert active_response.json().get("version") == 1
+        create_response = _make_request(
+            client,
+            "POST",
+            f"/v1/configs/{name}",
+            body={"scope": scope, "config": {"value": 2}},
+        )
+        assert create_response.status_code == 201, create_response.text
+
+        proposal_response = _make_request(
+            client,
+            "POST",
+            f"/v1/configs/{name}/2:propose",
+            body={"scope": scope, "author": "bob", "base_version": 1},
+        )
+        assert proposal_response.status_code == 201, proposal_response.text
+        assert proposal_response.json().get("base_version") == 1
+
+    def test_proposal_rejects_zero_after_activation(
+        self, client: httpx.Client
+    ) -> None:
+        name = "base-semantics-stale"
+        scope = {"env": "base-semantics-stale"}
+        _activate_initial_version(client, name=name, scope=scope)
+        create_response = _make_request(
+            client,
+            "POST",
+            f"/v1/configs/{name}",
+            body={"scope": scope, "config": {"value": 2}},
+        )
+        assert create_response.status_code == 201, create_response.text
+
+        stale_response = _make_request(
+            client,
+            "POST",
+            f"/v1/configs/{name}/2:propose",
+            body={"scope": scope, "author": "bob", "base_version": 0},
+        )
+        _assert_error_code(stale_response, 409, {"stale_base"})
 
 
 # =============================================================================
@@ -1616,7 +1763,7 @@ class TestFunctionality:
             },
         )
         proposals = list_response.json().get("proposals", [])
-        proposal_id = _proposal_id_for_draft_or_skip(proposals, 2)
+        proposal_id = _proposal_id_for_draft(proposals, 2)
 
         response = _make_request(
             client,
@@ -1655,7 +1802,7 @@ class TestFunctionality:
             body={"scope": {"env": "prod", "tenant": "acme", "app": "billing"}},
         )
         proposals = list_response.json().get("proposals", [])
-        proposal_id = _proposal_id_for_draft_or_skip(proposals, 2)
+        proposal_id = _proposal_id_for_draft(proposals, 2)
 
         response = _make_request(
             client,
@@ -1687,7 +1834,7 @@ class TestFunctionality:
             },
         )
         proposals = list_response.json().get("proposals", [])
-        proposal_id = _proposal_id_for_draft_or_skip(proposals, 3)
+        proposal_id = _proposal_id_for_draft(proposals, 3)
 
         response = _make_request(
             client,
@@ -1729,7 +1876,7 @@ class TestFunctionality:
             body={"scope": {"env": "prod", "tenant": "acme", "app": "billing"}},
         )
         proposals = list_response.json().get("proposals", [])
-        proposal_id = _proposal_id_for_draft_or_skip(proposals, 3)
+        proposal_id = _proposal_id_for_draft(proposals, 3)
 
         response = _make_request(
             client,
@@ -1759,7 +1906,7 @@ class TestFunctionality:
             },
         )
         proposals = list_response.json().get("proposals", [])
-        proposal_id = _proposal_id_for_draft_or_skip(proposals, 3)
+        proposal_id = _proposal_id_for_draft(proposals, 3)
 
         response = _make_request(
             client,
@@ -1788,8 +1935,7 @@ class TestFunctionality:
             body={"scope": {"env": "prod", "tenant": "acme", "app": "billing"}},
         )
         proposals = list_response.json().get("proposals", [])
-        if not proposals:
-            pytest.skip(_NO_ACTIVE_BOOTSTRAP_REASON)
+        assert proposals, "Expected at least one billing proposal."
         for proposal in proposals:
             summary = proposal.get("policy_summary")
             assert isinstance(summary, dict), (
@@ -1801,7 +1947,7 @@ class TestFunctionality:
             assert "tally" in summary, (
                 f"Missing tally in policy_summary: {summary}"
             )
-        proposal_id = _first_proposal_id_or_skip(proposals)
+        proposal_id = _first_proposal_id(proposals)
 
         response = _make_request(
             client,

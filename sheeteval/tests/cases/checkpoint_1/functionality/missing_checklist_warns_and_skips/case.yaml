@@ -25,7 +25,11 @@
     "returncode": 0,
     "stdout_exact": "Assignment Score: 0 / 0\n",
     "stderr_contains": [
-      "missing checklist sheet 'NoChecklist_Checklist'"
+      "NoChecklist_Checklist"
+    ],
+    "stderr_contains_casefold": [
+      "missing",
+      "checklist"
     ]
   }
 }

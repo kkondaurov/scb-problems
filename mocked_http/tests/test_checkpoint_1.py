@@ -8,8 +8,11 @@
 from __future__ import annotations
 
 import json
+import os
 import select
 import time
+from collections.abc import Callable
+from typing import TextIO
 
 import pytest
 import requests
@@ -424,50 +427,60 @@ def test_template_helpers_registered(
     assert response.text == "3|3|a,b|GO|YWJj|token|fallback|ab"
 
 
-def _find_http_log_line(
-    stream,
+def _find_matching_log_line(
+    stream: TextIO,
+    predicate: Callable[[dict[str, object]], bool],
     *,
     timeout: float = 4.0,
 ) -> dict[str, object] | None:
     deadline = time.monotonic() + timeout
-    required = {"http_path", "http_method", "http_host", "http_req", "http_res"}
+    pending = b""
     while time.monotonic() < deadline:
-        ready, _, _ = select.select([stream], [], [], 0.2)
+        ready, _, _ = select.select([stream.fileno()], [], [], 0.2)
         if not ready:
             continue
-        raw_line = stream.readline()
-        if raw_line == "":
-            continue
-        try:
-            payload = json.loads(raw_line.strip())
-        except json.JSONDecodeError:
-            continue
-        if required.issubset(payload.keys()):
-            return payload
+        chunk = os.read(stream.fileno(), 65536)
+        if not chunk:
+            break
+        pending += chunk
+        while b"\n" in pending:
+            raw_line, pending = pending.split(b"\n", 1)
+            try:
+                payload = json.loads(raw_line.decode("utf-8", errors="replace"))
+            except json.JSONDecodeError:
+                continue
+            if isinstance(payload, dict) and predicate(payload):
+                return payload
     return None
+
+
+def _find_http_log_line(
+    stream: TextIO,
+    *,
+    timeout: float = 4.0,
+) -> dict[str, object] | None:
+    required = {"http_path", "http_method", "http_host", "http_req", "http_res"}
+    return _find_matching_log_line(
+        stream,
+        lambda payload: required.issubset(payload),
+        timeout=timeout,
+    )
 
 
 def _find_warning_log_line(
-    stream,
+    stream: TextIO,
     *,
     timeout: float = 4.0,
 ) -> dict[str, object] | None:
-    deadline = time.monotonic() + timeout
-    while time.monotonic() < deadline:
-        ready, _, _ = select.select([stream], [], [], 0.2)
-        if not ready:
-            continue
-        raw_line = stream.readline()
-        if raw_line == "":
-            continue
-        try:
-            payload = json.loads(raw_line.strip())
-        except json.JSONDecodeError:
-            continue
+    def _is_warning(payload: dict[str, object]) -> bool:
         level = str(payload.get("level") or payload.get("log_level") or "")
-        if level.lower() in {"warn", "warning"}:
-            return payload
-    return None
+        return level.lower() in {"warn", "warning"}
+
+    return _find_matching_log_line(
+        stream,
+        _is_warning,
+        timeout=timeout,
+    )
 
 
 @pytest.mark.functionality

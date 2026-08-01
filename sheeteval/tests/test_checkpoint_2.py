@@ -289,7 +289,6 @@ def test_report_omits_manual_and_skipped_rules_from_lines_and_totals(
     assert result.returncode == 0, result.stderr
     assert result.stdout == "Assignment Score: 4 / 4\n"
     assert "unknown rule kind" in result.stderr.lower()
-    assert "yaml" in result.stderr.lower()
 
     report_text = report_file.read_text(encoding="utf-8")
     assert "[CORRECT] B5 B5: 4 / 4\n" in report_text

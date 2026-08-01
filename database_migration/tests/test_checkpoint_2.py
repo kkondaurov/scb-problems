@@ -5,11 +5,12 @@
 """Tests for checkpoint_2: Data Migrations."""
 
 import json
-import shutil
 import sqlite3
 import subprocess
 
 import pytest
+from conftest import assert_writable_seed_transaction
+from conftest import copy_seed_database
 
 
 def run_command(entrypoint_argv, *args, timeout=60):
@@ -38,7 +39,8 @@ def test_migrate_column_data(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Migrate data from one column to another."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
+    assert_writable_seed_transaction(db_file)
 
     migration = {
         "version": 2,
@@ -84,7 +86,7 @@ def test_backfill_data(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Backfill a column with constant value."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     migration = {
         "version": 2,
@@ -129,7 +131,7 @@ def test_transform_data(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Transform data using SQL expression."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     migration = {
         "version": 2,
@@ -179,7 +181,7 @@ def test_complete_column_migration(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Complete column migration pattern (add, migrate, drop)."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     # Capture original email values before migration
     with sqlite3.connect(db_file) as conn:
@@ -243,7 +245,7 @@ def test_migrate_column_data_overwrites_existing_values(
     """Functionality: Migrate column data overwrites existing values."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     with sqlite3.connect(db_file) as conn:
         conn.execute("UPDATE users SET email = 'temp@example.com'")
@@ -289,7 +291,7 @@ def test_migrate_column_data_default_value_for_null(
     """Functionality: Default value is used when from_column is NULL."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     with sqlite3.connect(db_file) as conn:
         conn.execute("UPDATE users SET old_email = NULL WHERE id = 1")
@@ -343,7 +345,7 @@ def test_backfill_data_without_where_updates_all(
     """Functionality: Backfill without where updates all rows."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     migration = {
         "version": 2,
@@ -391,7 +393,7 @@ def test_transformations_applied_in_order(
     """Functionality: Transformations run in the order listed."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     migration = {
         "version": 2,
@@ -706,7 +708,7 @@ def test_invalid_expression(entrypoint_argv, seeds_dir, tmp_path):
     """Error: Invalid SQL expression in transform should fail."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     migration = {
         "version": 2,
@@ -741,7 +743,7 @@ def test_migration_rolls_back_on_failure(entrypoint_argv, seeds_dir, tmp_path):
     """Error: Failed migration should roll back all operations."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     migration = {
         "version": 2,
@@ -792,7 +794,7 @@ def test_migrate_column_missing_from_column(entrypoint_argv, seeds_dir, tmp_path
     """Error: Missing from_column should fail."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     migration = {
         "version": 2,
@@ -821,7 +823,7 @@ def test_migrate_column_missing_to_column(entrypoint_argv, seeds_dir, tmp_path):
     """Error: Missing to_column should fail."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_2_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_2_users.db", db_file)
 
     migration = {
         "version": 2,

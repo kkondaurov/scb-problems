@@ -20,6 +20,7 @@ from urllib import parse as urllib_parse
 from urllib import request as urllib_request
 
 import pytest
+from fixture_integrity import assert_successful_finalized_creates_are_valid
 
 REQUEST_TIMEOUT = 10
 MAX_PAYLOAD_BYTES = 5 * 1024 * 1024
@@ -27,6 +28,7 @@ CASE_DATA_PATH = (
     Path(__file__).resolve().parent / "data" / "checkpoint_4_cases.json"
 )
 CASE_DATA = json.loads(CASE_DATA_PATH.read_text())
+assert_successful_finalized_creates_are_valid(CASE_DATA)
 
 SPEC_CASES = sorted(CASE_DATA["spec_cases"].keys())
 SPEC_ERRORS = sorted(CASE_DATA["spec_errors"].keys())

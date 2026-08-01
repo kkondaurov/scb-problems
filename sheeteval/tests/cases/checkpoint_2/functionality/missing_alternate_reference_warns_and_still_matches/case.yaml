@@ -55,6 +55,9 @@
     "stdout_exact": "Assignment Score: 5 / 5\n",
     "stderr_contains": [
       "Warning:",
+      "bad-ref"
+    ],
+    "stderr_contains_casefold": [
       "alternate"
     ]
   }

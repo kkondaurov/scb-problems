@@ -246,7 +246,7 @@ def test_functionality_scenario_requires_submission_formula_per_case(
     [
         (
             "unsupported_function",
-            "=VLOOKUP(A1, A1:B5, 2, FALSE)",
+            "=VLOOKUP(A1, A1:B5, 2, 0)",
             "unsupported function",
         ),
         ("malformed_formula", "=A1+", "malformed formula"),
@@ -320,7 +320,7 @@ def test_scenario_formula_errors_warn_and_fail_case(
                 "ScenarioErrors: 0 / 1 passed",
                 "Total: 0 / 1 passed",
             ],
-            "stderr_contains": [warning_fragment],
+            "stderr_contains_casefold": warning_fragment.split(),
         },
     }
 

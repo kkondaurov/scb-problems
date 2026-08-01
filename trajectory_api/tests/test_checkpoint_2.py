@@ -18,12 +18,14 @@ from urllib import error as urllib_error
 from urllib import request as urllib_request
 
 import pytest
+from fixture_integrity import assert_successful_finalized_creates_are_valid
 
 REQUEST_TIMEOUT = 10
 CASE_DATA_PATH = (
     Path(__file__).resolve().parent / "data" / "checkpoint_2_cases.json"
 )
 CASE_DATA = json.loads(CASE_DATA_PATH.read_text())
+assert_successful_finalized_creates_are_valid(CASE_DATA)
 
 SPEC_CASES = sorted(CASE_DATA["spec_cases"].keys())
 SPEC_ERRORS = sorted(CASE_DATA["spec_errors"].keys())
@@ -400,6 +402,9 @@ HIDDEN_REV_SECOND: SetupSequence = HIDDEN_REV_FIRST + [
 HIDDEN_REV_THIRD: SetupSequence = HIDDEN_REV_SECOND + [
     ("hidden", "rev_tracking_third_append"),
 ]
+HIDDEN_REV_FOURTH: SetupSequence = HIDDEN_REV_THIRD + [
+    ("hidden", "rev_tracking_fourth_append"),
+]
 HIDDEN_FINALIZE_REJECTS_ASSISTANT_END: SetupSequence = [
     ("hidden", "finalize_rejects_assistant_at_end_base"),
 ]
@@ -448,7 +453,10 @@ SETUP_SEQUENCES: dict[tuple[str, str], SetupSequence] = {
     ("hidden", "finalize_if_match_wrong_format"): HIDDEN_CREATE_IN_PROGRESS,
     ("hidden", "append_response_has_all_fields"): HIDDEN_CREATE_RESPONSE,
     ("hidden", "get_in_progress_includes_status_rev"): HIDDEN_CREATE_RESPONSE,
-    ("hidden", "finalize_response_has_finalized_at"): HIDDEN_APPEND_RESPONSE,
+    (
+        "hidden",
+        "finalize_response_has_finalized_at",
+    ): HIDDEN_FINALIZE_ACCEPTS_VALID,
     (
         "hidden",
         "finalize_metrics_array_value",
@@ -462,7 +470,7 @@ SETUP_SEQUENCES: dict[tuple[str, str], SetupSequence] = {
     (
         "hidden",
         "finalize_metrics_exactly_50_entries",
-    ): HIDDEN_CREATE_REV_TRACKING,
+    ): HIDDEN_FINALIZE_ACCEPTS_VALID,
     (
         "hidden",
         "append_running_totals_equal_valid",
@@ -488,8 +496,9 @@ SETUP_SEQUENCES: dict[tuple[str, str], SetupSequence] = {
     ("hidden", "rev_tracking_first_append"): HIDDEN_CREATE_REV_SEQUENCE,
     ("hidden", "rev_tracking_second_append"): HIDDEN_REV_FIRST,
     ("hidden", "rev_tracking_third_append"): HIDDEN_REV_SECOND,
-    ("hidden", "rev_tracking_get_unchanged"): HIDDEN_REV_THIRD,
-    ("hidden", "rev_tracking_finalize"): HIDDEN_REV_THIRD,
+    ("hidden", "rev_tracking_fourth_append"): HIDDEN_REV_THIRD,
+    ("hidden", "rev_tracking_get_unchanged"): HIDDEN_REV_FOURTH,
+    ("hidden", "rev_tracking_finalize"): HIDDEN_REV_FOURTH,
     ("hidden", "finalize_rejects_assistant_at_end"): HIDDEN_FINALIZE_REJECTS_ASSISTANT_END,
     ("hidden", "finalize_accepts_valid_trajectory"): HIDDEN_FINALIZE_ACCEPTS_VALID,
 }

@@ -499,3 +499,8 @@ def test_create_sorts_capabilities_even_with_duplicates(
         capabilities=["beta", "alpha", "beta", "alpha"],
     )
     assert unit["capabilities"] == ["alpha", "alpha", "beta", "beta"]
+
+    ledger = run_forge(entrypoint_argv, data_dir, ["ledger", "capabilities"])
+    assert unwrap_collection(
+        assert_success(ledger), key="capabilities"
+    ) == ["alpha", "beta"]

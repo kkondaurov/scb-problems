@@ -68,8 +68,10 @@
     "stdout_not_contains": [
       "Mixed Scenario.skip_me"
     ],
-    "stderr_contains": [
-      "missing input/output"
+    "stderr_contains_casefold": [
+      "missing",
+      "input",
+      "output"
     ]
   }
 }

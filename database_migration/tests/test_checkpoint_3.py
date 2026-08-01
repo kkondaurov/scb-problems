@@ -5,11 +5,11 @@
 """Tests for checkpoint_3: Foreign Keys, Indexes, and Constraints."""
 
 import json
-import shutil
 import sqlite3
 import subprocess
 
 import pytest
+from conftest import copy_seed_database
 
 
 def run_command(entrypoint_argv, *args, timeout=60):
@@ -38,7 +38,7 @@ def test_add_foreign_key(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Create posts table with foreign key to users."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_3_users.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_3_users.db", db_file)
 
     # First, run v1 migration to set up the version (seed already has tables)
     # Actually, the seed already has version 1, so we go directly to v2
@@ -86,7 +86,7 @@ def test_create_index(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Create composite index on posts table."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_3_posts.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_3_posts.db", db_file)
 
     migration = {
         "version": 2,
@@ -120,7 +120,7 @@ def test_add_check_constraint(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Add check constraint for age validation."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_3_users_age.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_3_users_age.db", db_file)
 
     migration = {
         "version": 2,
@@ -154,7 +154,7 @@ def test_complex_migration(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Create comments table with multiple foreign keys and indexes."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_3_users_posts.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_3_users_posts.db", db_file)
 
     migration = {
         "version": 2,
@@ -799,7 +799,7 @@ def test_foreign_key_with_restrict(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Create posts table with RESTRICT foreign key action."""
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_3_users_for_fk.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_3_users_for_fk.db", db_file)
 
     migration = {
         "version": 2,

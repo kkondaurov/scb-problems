@@ -18,7 +18,7 @@
         "RefExprErr": {
           "cells": {
             "G2": {
-              "formula": "=VLOOKUP(A1, B1:C3, 2, FALSE)",
+              "formula": "=VLOOKUP(A1, B1:C3, 2, 0)",
               "comment": "{\"rule\": {\"kind\": \"reference_expr\", \"points\": 3}}"
             }
           }
@@ -40,7 +40,7 @@
   "expected": {
     "returncode": 0,
     "stdout_exact": "Assignment Score: 0 / 3\n",
-    "stderr_contains": [
+    "stderr_contains_casefold": [
       "unsupported function"
     ]
   }

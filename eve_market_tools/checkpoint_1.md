@@ -57,7 +57,12 @@ markets. Build an API to provide this.
   - `location_id`: `int`
   - `type`: `Structure` | `Station`
   - `name`: `str`
-  - Structures are not in the SDE but the system they are in is contained at the beginning of their name.
+  - Ordinary structures are not in the SDE, but their names begin with the
+    solar-system name followed by ` - `.
+  - Some structure rows use the exact placeholder name
+    `Unknown Player Owned Structure`. Accept and store these rows verbatim;
+    their region is resolved from the `system_id` on each associated market
+    order rather than from the structure name.
 - Response **200**: `{ "status": "STATIONS_UPDATED", "count": <rows> }`.
 ## `GET /v1/market/{regionID}`
 - If no parameters, then this returns 200 with the overall stats for the region:
@@ -96,7 +101,10 @@ markets. Build an API to provide this.
 ]
 ```
 - Hubs are ordered by number of sell orders. Sell value is in billions (rounded to 2 decimal places) for orders at that station.
-- Unknown stations should be included with just their location id as a string instead of station name.
+- If a market location has no row in the uploaded station data, include it with
+  its location id as a string instead of a station name. A supplied
+  `Unknown Player Owned Structure` row is still a known station-data row and
+  uses that placeholder as its name.
 ## `GET /v1/market/{regionID}/{typeID}`
 - Returns code **200** with the detailed market stats for a specific type id:
 ```json

@@ -50,7 +50,7 @@
   "expected": {
     "returncode": 0,
     "stdout_exact": "Assignment Score: 0 / 3\n",
-    "stderr_contains": [
+    "stderr_contains_casefold": [
       "negative tolerance"
     ]
   }

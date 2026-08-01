@@ -5,10 +5,10 @@
 """Tests for checkpoint_5: Dependency Management and Migration Chains."""
 
 import json
-import shutil
 import subprocess
 
 import pytest
+from conftest import copy_seed_database
 
 
 def run_command(entrypoint_argv, *args, timeout=60):
@@ -36,7 +36,7 @@ def parse_jsonl(text):
 def test_simple_dependency(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Apply migration with dependency resolution via --migrations-dir."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_5_simple_dependency.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_5_simple_dependency.db", db_file)
 
     migrations_dir = tmp_path / "migrations"
     migrations_dir.mkdir()
@@ -178,7 +178,7 @@ def test_simple_dependency(entrypoint_argv, seeds_dir, tmp_path):
 def test_migrate_all(entrypoint_argv, seeds_dir, tmp_path):
     """Core: migrate-all applies all migrations in dependency order."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_5_migrate_all.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_5_migrate_all.db", db_file)
 
     migrations_dir = tmp_path / "migrations"
     migrations_dir.mkdir()
@@ -345,7 +345,7 @@ def test_migrate_all(entrypoint_argv, seeds_dir, tmp_path):
 def test_complex_dependency(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: migrate-all handles a diamond dependency graph."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_5_complex_dependency.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_5_complex_dependency.db", db_file)
 
     migrations_dir = tmp_path / "migrations"
     migrations_dir.mkdir()
@@ -592,7 +592,7 @@ def test_complex_dependency(entrypoint_argv, seeds_dir, tmp_path):
 def test_parallel_dependencies(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: migrate-all resolves file/version mismatches."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_5_parallel_dependencies.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_5_parallel_dependencies.db", db_file)
 
     migrations_dir = tmp_path / "migrations"
     migrations_dir.mkdir()

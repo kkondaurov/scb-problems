@@ -29,7 +29,11 @@ When `--log` is active, the log line for a prerequisite-gated rule reflects the 
 
 The `flags` column in _Checklist supports single-character modifiers. Flag values are case-insensitive. Multiple flags combine by concatenation (e.g., `CF` or `FC`; letter order is irrelevant).
 
-**Fatal (`F`):** When a fatal-flagged rule's comparison produces outcome INCORRECT (not CORRECT), all remaining unevaluated rules on that sheet are immediately skipped. Each skipped rule scores 0 and appears in the report with a `SKIPPED` outcome, scoring 0.
+**Fatal (`F`):** When a fatal-flagged rule reaches any non-CORRECT outcome —
+either `INCORRECT` or `PREREQ` — all remaining unevaluated rules on that
+sheet are immediately skipped. This includes a fatal rule whose comparison is
+not run because one of its prerequisites is unmet. Each skipped rule scores 0
+and appears in the report with a `SKIPPED` outcome, scoring 0.
 
 Rules already evaluated before the fatal failure retain their scores. Skipped rules' `rule.points` are still counted in max-possible totals (unlike rules skipped due to annotation errors, which are excluded).
 

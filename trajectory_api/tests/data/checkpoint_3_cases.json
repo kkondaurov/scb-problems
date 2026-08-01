@@ -4022,7 +4022,7 @@
         "body": {
           "append": [],
           "status": "finalized",
-          "up_to_step": 2
+          "up_to_step": 3
         },
         "headers": {
           "content-type": "application/json; charset=utf-8",
@@ -4046,7 +4046,7 @@
               "const": "finalized"
             },
             "steps": {
-              "const": 3
+              "const": 4
             }
           },
           "required": [
@@ -4859,6 +4859,13 @@
               "input_tokens": 10,
               "output_tokens": 20,
               "role": "assistant"
+            },
+            {
+              "content": "Trajectory finalized.",
+              "cost": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "role": "environment"
             }
           ]
         },
@@ -4889,7 +4896,7 @@
               "const": "finalized"
             },
             "steps": {
-              "const": 2
+              "const": 3
             }
           },
           "required": [
@@ -5756,7 +5763,7 @@
         "body": {
           "branch": "second-fork-same-parent",
           "status": "in_progress",
-          "up_to_step": 1
+          "up_to_step": 2
         },
         "headers": {
           "content-type": "application/json; charset=utf-8",
@@ -5815,7 +5822,7 @@
         "body": {
           "branch": "fork-from-finalized",
           "status": "in_progress",
-          "up_to_step": 3
+          "up_to_step": 2
         },
         "headers": {
           "content-type": "application/json; charset=utf-8",
@@ -6068,7 +6075,7 @@
         "body": {
           "branch": "regression-fork-for-finalize",
           "status": "in_progress",
-          "up_to_step": 3
+          "up_to_step": 2
         },
         "headers": {
           "content-type": "application/json; charset=utf-8",
@@ -6862,7 +6869,7 @@
             "pass": true
           },
           "status": "finalized",
-          "up_to_step": 4
+          "up_to_step": 5
         },
         "headers": {
           "content-type": "application/json; charset=utf-8",
@@ -6905,7 +6912,7 @@
                   "const": null
                 },
                 "forked_from_step": {
-                  "const": 4
+                  "const": 5
                 },
                 "parent_id": {
                   "const": "{{store.create_in_progress_trajectory}}"
@@ -6943,7 +6950,7 @@
               "const": "finalized"
             },
             "steps": {
-              "const": 5
+              "const": 6
             },
             "task": {
               "const": "cot_math_gsm8k"

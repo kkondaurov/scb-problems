@@ -5,11 +5,11 @@
 """Tests for checkpoint_4: Rollback Support."""
 
 import json
-import shutil
 import sqlite3
 import subprocess
 
 import pytest
+from conftest import copy_seed_database
 
 
 def run_command(entrypoint_argv, *args, timeout=60):
@@ -37,7 +37,7 @@ def parse_jsonl(text):
 def test_simple_rollback(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Rollback the last migration (default count=1)."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_simple_rollback.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_simple_rollback.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -54,7 +54,7 @@ def test_simple_rollback(entrypoint_argv, seeds_dir, tmp_path):
 def test_rollback_multiple(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Rollback multiple migrations using --count."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_rollback_multiple.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_rollback_multiple.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file), "--count", "2")
 
@@ -74,7 +74,7 @@ def test_rollback_multiple(entrypoint_argv, seeds_dir, tmp_path):
 def test_rollback_to_version(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Rollback to a specific version using --to-version."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_rollback_to_version.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_rollback_to_version.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file), "--to-version", "2")
 
@@ -94,7 +94,7 @@ def test_rollback_to_version(entrypoint_argv, seeds_dir, tmp_path):
 def test_explicit_rollback(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Rollback uses explicit rollback_operations when provided."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_explicit_rollback.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_explicit_rollback.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -111,7 +111,7 @@ def test_explicit_rollback(entrypoint_argv, seeds_dir, tmp_path):
 def test_rollback_data_migration(entrypoint_argv, seeds_dir, tmp_path):
     """Core: Rollback data migration reverses operations in reverse order."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_rollback_data_migration.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_rollback_data_migration.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -144,7 +144,7 @@ def test_rollback_data_migration(entrypoint_argv, seeds_dir, tmp_path):
 def test_rollback_drop_column(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Rollback drop_column restores column metadata."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_rollback_drop_column.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_rollback_drop_column.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -167,7 +167,7 @@ def test_rollback_drop_column(entrypoint_argv, seeds_dir, tmp_path):
 def test_rollback_create_index(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Rollback create_index drops the index."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_rollback_create_index.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_rollback_create_index.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -185,7 +185,7 @@ def test_rollback_create_index(entrypoint_argv, seeds_dir, tmp_path):
 def test_rollback_drop_index(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Rollback drop_index recreates the index."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_rollback_drop_index.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_rollback_drop_index.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -207,7 +207,7 @@ def test_rollback_drop_index(entrypoint_argv, seeds_dir, tmp_path):
 def test_rollback_add_check_constraint(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Rollback add_check_constraint drops the constraint."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_rollback_add_check.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_rollback_add_check.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -227,7 +227,7 @@ def test_rollback_drop_check_constraint(
 ):
     """Functionality: Rollback drop_check_constraint recreates the constraint."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_rollback_drop_check.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_rollback_drop_check.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -251,7 +251,7 @@ def test_rollback_drop_check_constraint(
 def test_rollback_add_foreign_key(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Rollback add_foreign_key drops the foreign key."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_rollback_add_fk.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_rollback_add_fk.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -269,7 +269,7 @@ def test_rollback_add_foreign_key(entrypoint_argv, seeds_dir, tmp_path):
 def test_rollback_drop_foreign_key(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Rollback drop_foreign_key recreates the foreign key."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_rollback_drop_fk.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_rollback_drop_fk.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -329,7 +329,7 @@ def test_rollback_multiple_ops_one_migration(
 ):
     """Functionality: Rollback reverses multiple operations in reverse order."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_multiple_ops.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_multiple_ops.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -354,7 +354,7 @@ def test_rollback_multiple_ops_one_migration(
 def test_rollback_only_one_migration(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Rollback when only one migration exists."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_only_one.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_only_one.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -372,7 +372,7 @@ def test_rollback_only_one_migration(entrypoint_argv, seeds_dir, tmp_path):
 def test_non_sequential_versions(entrypoint_argv, seeds_dir, tmp_path):
     """Functionality: Rollback works with non-sequential version numbers (1, 3, 7)."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_non_sequential.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_non_sequential.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file), "--count", "2")
 
@@ -952,7 +952,7 @@ def test_rollback_removes_migration_records(entrypoint_argv, tmp_path):
 def test_no_migrations(entrypoint_argv, seeds_dir, tmp_path):
     """Error: Rollback fails when no migrations have been applied."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_no_migrations.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_no_migrations.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -965,7 +965,7 @@ def test_no_migrations(entrypoint_argv, seeds_dir, tmp_path):
 def test_version_not_found(entrypoint_argv, seeds_dir, tmp_path):
     """Error: Rollback fails when target version doesn't exist."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_version_not_found.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_version_not_found.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file), "--to-version", "10")
 
@@ -978,7 +978,7 @@ def test_version_not_found(entrypoint_argv, seeds_dir, tmp_path):
 def test_transform_data_no_rollback_ops(entrypoint_argv, seeds_dir, tmp_path):
     """Error: Rollback fails for transform_data without explicit rollback_operations."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_transform_no_rollback.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_transform_no_rollback.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 
@@ -990,7 +990,7 @@ def test_transform_data_no_rollback_ops(entrypoint_argv, seeds_dir, tmp_path):
 def test_backfill_data_no_rollback_ops(entrypoint_argv, seeds_dir, tmp_path):
     """Error: Rollback fails for backfill_data without explicit rollback_operations."""
     db_file = tmp_path / "app.db"
-    shutil.copy(seeds_dir / "checkpoint_4_backfill_no_rollback.db", db_file)
+    copy_seed_database(seeds_dir / "checkpoint_4_backfill_no_rollback.db", db_file)
 
     result = run_command(entrypoint_argv, "rollback", str(db_file))
 

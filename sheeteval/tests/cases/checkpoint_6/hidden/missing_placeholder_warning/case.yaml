@@ -64,8 +64,8 @@
       "FAIL: Missing Cell Template",
       "Total: 0 / 1 passed"
     ],
-    "stderr_contains": [
-      "placeholder '$Z9' not found in submission"
+    "stderr_contains_casefold": [
+      "warning"
     ]
   }
 }

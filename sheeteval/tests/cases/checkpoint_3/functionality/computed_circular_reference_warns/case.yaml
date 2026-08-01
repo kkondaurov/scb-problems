@@ -50,8 +50,9 @@
   "expected": {
     "returncode": 0,
     "stdout_exact": "Assignment Score: 0 / 2\n",
-    "stderr_contains": [
-      "circular reference"
+    "stderr_contains_casefold": [
+      "circular",
+      "reference"
     ]
   }
 }

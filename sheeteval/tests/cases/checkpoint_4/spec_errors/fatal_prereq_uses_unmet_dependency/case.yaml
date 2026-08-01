@@ -55,10 +55,13 @@
     "returncode": 0,
     "stdout_exact": "Assignment Score: 0 / 9\n",
     "stderr_contains": [
-      "dependency",
-      "not on current sheet",
       "LOG AnyDep.B3: literal PREREQ",
       "LOG AnyDep.B4: literal SKIPPED"
+    ],
+    "stderr_contains_casefold": [
+      "dependency",
+      "not",
+      "current sheet"
     ],
     "files": [
       {

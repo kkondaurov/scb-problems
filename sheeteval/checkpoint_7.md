@@ -20,7 +20,8 @@ Each graded sheet produces:
    - **Outcome**: one of `CORRECT`, `INCORRECT`, `PREREQ`, or `SKIPPED`.
    - **Earned**: numeric earned points.
    - **Possible**: numeric possible points.
-3. A `<p class="subtotal">` element after the table with the text `<sheet-name>: <earned> / <max>`.
+3. A `<p class="subtotal">` element after the table with the exact text
+   `Sheet '<sheet-name>': <earned> / <max>`.
 
 After all sheet sections, a `<p class="total">` element with the text `Total: <earned> / <max>`.
 
@@ -57,7 +58,7 @@ Combined `CF`/`FC` flags produce the concealed hint in HTML while retaining fata
 
 When a sheet's earned score triggers the `min-score` threshold, the HTML output for that sheet replaces the rule table entirely with a single threshold message element using `class="threshold"`.
 
-The message text is the sheet's configured `threshold-message`, or `"Minimum score not met."` if none is configured. The subtotal element still follows, showing the zeroed score.
+The message text is the sheet's configured `threshold-message`, or `"Minimum score not met."` if none is configured. The normal-mode subtotal element still follows in the same `Sheet '<sheet-name>': <earned> / <max>` format, showing the zeroed score.
 
 In check mode, threshold-triggered sheets follow the same pattern: no table is produced, the threshold message appears, and the subtotal reflects that all rules count as failed (e.g., `<sheet-name>: 0 / <total> passed`).
 

@@ -10,7 +10,10 @@ import json
 from pathlib import Path
 
 import pytest
-from case_utils import CASES_DIR, case_id, discover_cases, run_case
+from case_utils import CASES_DIR
+from case_utils import case_id
+from case_utils import discover_cases
+from case_utils import run_case
 
 CHECKPOINT_DIR = CASES_DIR / Path(__file__).stem.replace("test_", "")
 CORE_DIR = CHECKPOINT_DIR / "core"
@@ -109,7 +112,8 @@ def test_formula_eval_failure_scores_zero_in_penalty_mode(
                 "expected": {
                     "returncode": 0,
                     "stdout_exact": "Assignment Score: 0 / 0\n",
-                    "stderr_contains": ["unsupported function 'VLOOKUP'"],
+                    "stderr_contains": ["VLOOKUP", "PenaltyFail.C3"],
+                    "stderr_contains_casefold": ["unsupported function"],
                     "files": [
                         {
                             "path": "report.txt",

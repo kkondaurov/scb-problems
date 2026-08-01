@@ -30,7 +30,7 @@
       "sheets": {
         "ComputedFailAlt": {
           "cells": {
-            "E2": {"formula": "=VLOOKUP(A1,B1:C3,2,FALSE)"},
+            "E2": {"formula": "=VLOOKUP(A1,B1:C3,2,0)"},
             "A1": {"value": 1}
           }
         }
@@ -40,7 +40,7 @@
   "expected": {
     "returncode": 0,
     "stdout_exact": "Assignment Score: 0 / 4\n",
-    "stderr_contains": [
+    "stderr_contains_casefold": [
       "unsupported function"
     ]
   }
