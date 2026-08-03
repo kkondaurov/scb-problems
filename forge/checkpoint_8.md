@@ -14,6 +14,7 @@ Blueprint create and blueprint delete are gated by configurable access rules. Ru
 Path resolution for `rules_file` from config:
 
 - If the `rules_file` key is present in config, its value must be a non-empty string path. Any other value produces `configuration_error` before revision negotiation.
+- A relative `rules_file` value from config is resolved against the process current working directory, not the directory containing the configuration file. Absolute paths are used as given.
 
 The rules file maps operation identifiers to required role strings:
 

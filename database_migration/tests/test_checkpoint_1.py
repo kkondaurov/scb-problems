@@ -429,11 +429,9 @@ def test_drop_column_preserves_existing_data(entrypoint_argv, tmp_path):
 
 @pytest.mark.functionality
 def test_foreign_keys_disabled_during_drop_column(
-    entrypoint_argv, tmp_path, checkpoint_name
+    entrypoint_argv, tmp_path
 ):
     """Functionality: Drops succeed even when foreign keys are present."""
-    if checkpoint_name not in ("checkpoint_1", "checkpoint_2"):
-        pytest.skip("Applies only to checkpoints 1-2")
     migration_file = tmp_path / "migration.json"
     db_file = tmp_path / "app.db"
 
@@ -478,6 +476,30 @@ def test_foreign_keys_disabled_during_drop_column(
         },
         {"event": "migration_complete", "version": 2, "operations_count": 1},
     ]
+
+    with sqlite3.connect(db_file) as conn:
+        parent_columns = [
+            row[1] for row in conn.execute("PRAGMA table_info(parents)")
+        ]
+        parent_rows = conn.execute(
+            "SELECT id FROM parents ORDER BY id"
+        ).fetchall()
+        child_rows = conn.execute(
+            "SELECT id, parent_id FROM children ORDER BY id"
+        ).fetchall()
+        child_foreign_keys = conn.execute(
+            "PRAGMA foreign_key_list(children)"
+        ).fetchall()
+        foreign_key_errors = conn.execute("PRAGMA foreign_key_check").fetchall()
+
+    assert parent_columns == ["id"]
+    assert parent_rows == [(1,)]
+    assert child_rows == [(1, 1)]
+    assert any(
+        row[2] == "parents" and row[3] == "parent_id" and row[4] == "id"
+        for row in child_foreign_keys
+    )
+    assert foreign_key_errors == []
 
 
 @pytest.mark.functionality

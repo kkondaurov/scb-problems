@@ -208,6 +208,20 @@ class MigrationTool:
         columns = [row[1] for row in cursor.fetchall()]
         return column_name in columns
 
+    def _has_incoming_foreign_keys(self, table_name: str) -> bool:
+        """Return whether another table has a foreign key to this table."""
+        cursor = self.conn.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"
+        )
+        for (other_table,) in cursor.fetchall():
+            foreign_keys = self.conn.execute(
+                "PRAGMA foreign_key_list("
+                f"{self._quote_identifier(other_table)})"
+            ).fetchall()
+            if any(row[2] == table_name for row in foreign_keys):
+                return True
+        return False
+
     def _get_table_columns(self, table_name: str) -> list[dict[str, Any]]:
         """Get column information for a table.
 
@@ -921,6 +935,19 @@ class MigrationTool:
         )
         if column_to_drop["pk"] != 0:
             raise MigrationError("cannot drop a PRIMARY KEY column")
+
+        if self._has_incoming_foreign_keys(table_name):
+            self.conn.execute(
+                f"ALTER TABLE {self._quote_identifier(table_name)} "
+                f"DROP COLUMN {self._quote_identifier(column_name)}"
+            )
+            return {
+                "event": "operation_applied",
+                "type": "drop_column",
+                "table": table_name,
+                "column": column_name,
+                "version": version,
+            }
 
         existing_constraints = self._get_table_constraints(table_name)
         # Remove constraints that reference the dropped column and defer primary key recreation.
