@@ -17,6 +17,15 @@ from typing import Any
 CASES_DIR = Path(__file__).parent / "cases"
 
 
+def _normalize_html_apostrophes(source: str) -> str:
+    return re.sub(
+        r"(?:&#x0*27;|&#0*39;|&apos;)",
+        "'",
+        source,
+        flags=re.IGNORECASE,
+    )
+
+
 def discover_cases(group_dir: Path) -> list[Path]:
     """Return sorted case dirs containing case.yaml."""
     if not group_dir.exists():
@@ -342,7 +351,9 @@ def run_case(
     ):
         html_path = tmp_path / "report.html"
         assert html_path.exists(), f"Missing HTML report: {html_path}"
-        html = html_path.read_text(encoding="utf-8")
+        html = _normalize_html_apostrophes(
+            html_path.read_text(encoding="utf-8")
+        )
         if html_contains:
             _assert_contains(html, list(html_contains), "html")
         if html_not_contains:

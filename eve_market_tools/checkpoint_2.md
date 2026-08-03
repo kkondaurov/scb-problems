@@ -119,7 +119,8 @@ Request body:
 }
 ```
 - If there is not market data loaded or a `market` is null then **ALL** pricing related keys have value null.
-- `yields` are the lowest value yield actually used for each. 
+- `yields` use the same 0-1 multiplier scale as request `efficiency` and are
+  the lowest value yield actually used for each category.
 - Ships use packaged weight (e.g. Rifter = 2.5K m3)
 - Quick example: `Radio S` @ 50% returns 4 pyerite and 1 isogen. Drill down: 10 Light Neutron Blaster IIs include 26 hypersynaptic fibers of the 90 possible.
 - Prices use the **HUB** specific prices.

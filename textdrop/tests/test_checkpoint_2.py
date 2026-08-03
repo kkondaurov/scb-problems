@@ -13,6 +13,7 @@ from typing import Any
 import httpx
 import pytest
 from _helpers import assert_html_status
+from _helpers import assert_pre_has_direct_code_child
 from _helpers import create_note_via_form
 from _helpers import create_note_via_json
 
@@ -269,7 +270,7 @@ def test_json_submission_defaults_to_plain_text_when_mode_missing_or_empty(
     view = client.get(f"/n/{note_id}")
     assert view.status_code == 200
     assert "<h1" not in view.text
-    assert "<pre><code>" in view.text
+    assert_pre_has_direct_code_child(view.text)
 
 
 @pytest.mark.functionality
@@ -331,7 +332,7 @@ def test_fenced_code_tokenization_depends_on_language_hint(
     )
     response = client.get(f"/n/{note_id}")
     assert response.status_code == 200
-    assert "<pre><code>" in response.text
+    assert_pre_has_direct_code_child(response.text)
     if span_fragment is not None:
         pre_start = response.text.find("<pre")
         pre_end = response.text.find("</pre>", pre_start)
@@ -350,7 +351,7 @@ def test_fenced_code_without_language_renders_content_in_pre_code(
     note_id = create_note_via_form(client, content=source, mode="markdown")
     response = client.get(f"/n/{note_id}")
     assert response.status_code == 200
-    assert "<pre><code>" in response.text
+    assert_pre_has_direct_code_child(response.text)
     assert "hello world" in response.text
 
 

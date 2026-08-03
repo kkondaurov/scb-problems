@@ -2230,7 +2230,7 @@
               "const": 4
             },
             "updated_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             }
           },
@@ -2341,7 +2341,7 @@
               "const": 3
             },
             "updated_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             }
           },
@@ -2775,7 +2775,7 @@
         "output": {
           "properties": {
             "finalized_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             },
             "rev": {
@@ -3052,7 +3052,7 @@
               "const": 10
             },
             "finalized_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             },
             "id": {
@@ -3115,7 +3115,7 @@
         "output": {
           "properties": {
             "finalized_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             },
             "id": {
@@ -3746,7 +3746,7 @@
         "output": {
           "properties": {
             "finalized_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             },
             "id": {
@@ -4472,7 +4472,7 @@
               "const": 2
             },
             "updated_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             }
           },
@@ -4544,7 +4544,7 @@
               "const": 4
             },
             "updated_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             }
           },
@@ -4616,7 +4616,7 @@
               "const": 5
             },
             "updated_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             }
           },
@@ -4821,7 +4821,7 @@
         "output": {
           "properties": {
             "created_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             },
             "date": {
@@ -4908,7 +4908,7 @@
               "const": 25
             },
             "finalized_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             },
             "id": {
@@ -4969,7 +4969,7 @@
               "const": 15
             },
             "finalized_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             },
             "id": {
@@ -5204,7 +5204,7 @@
               "const": 6
             },
             "updated_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             }
           },
@@ -5381,7 +5381,7 @@
               "const": 5
             },
             "updated_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             }
           },
@@ -5646,7 +5646,7 @@
         "output": {
           "properties": {
             "created_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             },
             "date": {
@@ -5876,7 +5876,7 @@
               "const": 25
             },
             "finalized_at": {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
               "type": "string"
             },
             "id": {

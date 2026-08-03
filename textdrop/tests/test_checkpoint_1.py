@@ -21,6 +21,7 @@ import pytest
 from _helpers import assert_complete_html_document
 from _helpers import assert_content_type
 from _helpers import assert_html_status
+from _helpers import assert_pre_has_direct_code_child
 from _helpers import create_note_via_form
 from _helpers import parse_note_id
 from _helpers import submit_form
@@ -130,7 +131,7 @@ def test_note_view_is_complete_html_and_escapes_content(
     assert response.status_code == 200
     assert_content_type(response, "text/html")
     assert_complete_html_document(response.text)
-    assert "<pre><code>" in response.text
+    assert_pre_has_direct_code_child(response.text)
     assert "&lt;div&gt;&quot;a &amp; b&quot;&lt;/div&gt;" in response.text
 
 

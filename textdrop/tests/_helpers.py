@@ -15,6 +15,10 @@ import httpx
 
 NOTE_ID_PATTERN = re.compile(r"^/n/([A-Za-z0-9._~-]+)$")
 TIMESTAMP_PATTERN = re.compile(r"\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\b")
+PRE_CODE_PATTERN = re.compile(
+    r"<pre(?:\s[^>]*)?>\s*<code(?:\s[^>]*)?>",
+    flags=re.IGNORECASE,
+)
 
 
 def assert_content_type(response: httpx.Response, expected_prefix: str) -> None:
@@ -35,6 +39,10 @@ def assert_html_status(response: httpx.Response, status_code: int) -> None:
     assert response.status_code == status_code
     assert_content_type(response, "text/html")
     assert_complete_html_document(response.text)
+
+
+def assert_pre_has_direct_code_child(body: str) -> None:
+    assert PRE_CODE_PATTERN.search(body) is not None
 
 
 def parse_note_id(location_header: str) -> str:
